@@ -29,9 +29,7 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const getTrackingDetails = async (req, res) => {
-  const { awbNumber, vendorawbnumber } = req.body;
-
-  const requestBody = { ...vendorCredentials.UPS, AWBNo: vendorawbnumber };
+  const { awbNumber } = req.body;
 
   if (!awbNumber) {
     return res.status(400).json({ error: "awbNumber is required" });
@@ -51,6 +49,10 @@ const getTrackingDetails = async (req, res) => {
 
     const docData = snapshot.docs[0].data();
     const statusTrail = getTrackingStatus(docData.status);
+    const requestBody = {
+      ...vendorCredentials.UPS,
+      AWBNo: docData.vendorAwbnumber?.toUpperCase(),
+    };
 
     if (docData.status !== "SHIPMENT CONNECTED") {
       return res.status(200).json({
